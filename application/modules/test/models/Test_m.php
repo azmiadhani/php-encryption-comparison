@@ -6,6 +6,11 @@ class Test_m extends CI_Model
     public $content;
     public $date;
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function get_last_ten_entries()
     {
         $query = $this->db->get('entries', 10);
@@ -21,24 +26,27 @@ class Test_m extends CI_Model
         return $code;
     }
 
-    function azcrypt($mode, $string, $key)
+    //! openssl 
+    function azcrypt($mode, $string, $key, $ciphering)
     {
         // Store cipher method 
-        $ciphering = "AES-256-CBC";
+        // $ciphering = "AES-256-CBC";
+        // $ciphering = "camellia-256-cbc";
+
         $options = 0;
         $encryption_iv = '1122334455667788';
         if ($mode == 'encrypt') {
-            $encryption = urlencode(base64_encode(openssl_encrypt(
+            $encryption = openssl_encrypt(
                 $string,
                 $ciphering,
                 $key,
                 $options,
                 $encryption_iv
-            )));
+            );
             return $encryption;
         } else if ($mode == 'decrypt') {
             $decryption = openssl_decrypt(
-                base64_decode($string),
+                $string,
                 $ciphering,
                 $key,
                 $options,
@@ -46,17 +54,5 @@ class Test_m extends CI_Model
             );
             return $decryption;
         }
-    }
-
-    function getCSV()
-    {
-        $data = file_get_contents(base_url('assets/pilihanEnkripsi.csv'));
-        $rows = explode("\n", $data);
-        $s = array();
-        foreach ($rows as $row) {
-            $s[] = str_getcsv($row)[0];
-        }
-
-        return $s;
     }
 }
